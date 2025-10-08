@@ -70,7 +70,7 @@ router.post(
 
       // const proc = spawn('python3', spawnArgs);
      
-      const proc = spawn(pythonPath, [scriptPath]);
+      const proc = spawn(pythonPath, spawnArgs);
 
       // const proc = spawn(
       //   'C:\\Users\\IFOCUS\\AppData\\Local\\Programs\\Python\\Python310\\python.exe',
