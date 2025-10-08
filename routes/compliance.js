@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { spawn } = require('child_process');
 const path = require('path');
-const pythonPath = 'C:\\Users\\IFOCUS\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
+// const pythonPath = 'C:\\Users\\IFOCUS\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
+const pythonPath = process.env.PYTHON_EXEC || 'python3';
+
 
 router.get('/run-compliance-check', (req, res) => {
-  const scriptPath = path.join(__dirname, '..', 'map_rbi_compliance2.py');
+  const scriptPath = path.join(__dirname, '..', 'map_rbi_compliance.py');
 
   const process = spawn(pythonPath, [scriptPath]);
   
