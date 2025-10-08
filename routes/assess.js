@@ -67,7 +67,10 @@ router.post(
         spawnArgs.push('--model_type', mappedModelType);
       }
 
-      const proc = spawn('python3', spawnArgs);
+      // const proc = spawn('python3', spawnArgs);
+      const pythonPath = process.env.PYTHON_EXEC || 'python3';
+      const proc = spawn(pythonPath, [scriptPath]);
+
       // const proc = spawn(
       //   'C:\\Users\\IFOCUS\\AppData\\Local\\Programs\\Python\\Python310\\python.exe',
       //   spawnArgs
