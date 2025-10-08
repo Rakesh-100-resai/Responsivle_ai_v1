@@ -1,0 +1,13 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore logs
+*.log
+
+# Ignore build folders or temp files
+dist/
+build/
+*.tmp
+uploads/
+assessments.db
+~lock.rbi_compliance_report2.csv#

@@ -151,7 +151,7 @@
         }
 
         // Fetch sector details from API
-        const res = await fetch(`/api/sectors?id=${sectorId}`);
+  const res = await fetch(`/api/sectors/${sectorId}`);
         const sector = await res.json();
         if (sector && sector.title && sector.summary) {
           document.getElementById('sector-title').textContent = sector.title;

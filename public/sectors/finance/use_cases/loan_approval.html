@@ -279,7 +279,7 @@
     }
 
     function runComplianceCheck() {
-      fetch('http://localhost:5000/api/run-compliance-check') // Updated path
+  fetch('/api/run-compliance-check') // Use relative path for compatibility
         .then(res => res.json())
         .then(data => {
           const list = document.getElementById('summaryList');
@@ -374,7 +374,7 @@
       formData.append("principles", JSON.stringify(selectedPrinciples));
 
       try {
-        const res = await fetch("http://localhost:5000/api/assess", {
+  const res = await fetch("/api/assess", {
           method: "POST",
           body: formData
         });
