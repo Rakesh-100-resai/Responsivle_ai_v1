@@ -5,6 +5,7 @@ const fs = require('fs').promises;
 const { spawn } = require('child_process');
 const { v4: uuid } = require('uuid');
 const db = require('../utils/db');
+const pythonPath = process.env.PYTHON_EXEC || 'python3';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
@@ -68,7 +69,7 @@ router.post(
       }
 
       // const proc = spawn('python3', spawnArgs);
-      const pythonPath = process.env.PYTHON_EXEC || 'python3';
+     
       const proc = spawn(pythonPath, [scriptPath]);
 
       // const proc = spawn(
