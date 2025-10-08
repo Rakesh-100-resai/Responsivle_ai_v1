@@ -63,6 +63,73 @@
 //   });
 // });
 
+// const express = require('express');
+// const { spawn } = require('child_process');
+// const path = require('path');
+// const db = require('../utils/db');
+
+// const router = express.Router();
+// const pythonPath = process.env.PYTHON_EXEC || 'python3';
+
+// router.get('/run-compliance-check/:reportId', async (req, res) => {
+//   try {
+//     const { reportId } = req.params;
+
+//     // 1️⃣ Get latest evaluation scores from DB
+//     const row = await db.get('SELECT scores FROM reports WHERE id = ?', [reportId]);
+//     if (!row || !row.scores) {
+//       return res.status(400).json({
+//         error: 'No evaluation results found. Please run Responsible AI Assessment first.'
+//       });
+//     }
+
+//     const evaluationData = row.scores;
+
+//     // 2️⃣ Call Python script
+//     const scriptPath = path.join(__dirname, '..', 'map_rbi_compliance.py');
+//     const process = spawn(pythonPath, [scriptPath], { cwd: path.join(__dirname, '..') });
+
+//     let output = '';
+//     let errorOutput = '';
+
+//     process.stdin.write(evaluationData);
+//     process.stdin.end();
+
+//     process.stdout.on('data', data => {
+//       output += data.toString();
+//       console.log('[Python stdout]:', data.toString());
+//     });
+
+//     process.stderr.on('data', data => {
+//       errorOutput += data.toString();
+//       console.error('[Python stderr]:', data.toString());
+//     });
+
+//     process.on('close', code => {
+//       if (code === 0) {
+//         res.json({
+//           success: true,
+//           message: '✅ Compliance check completed successfully.',
+//           output
+//         });
+//       } else {
+//         res.status(500).json({
+//           error: '❌ Compliance check failed.',
+//           details: errorOutput
+//         });
+//       }
+//     });
+//   } catch (err) {
+//     console.error('[COMPLIANCE ERROR]:', err);
+//     res.status(500).json({ error: 'Internal server error.' });
+//   }
+// });
+
+// module.exports = router;
+
+
+
+
 const express = require('express');
 const { spawn } = require('child_process');
 const path = require('path');
@@ -71,11 +138,12 @@ const db = require('../utils/db');
 const router = express.Router();
 const pythonPath = process.env.PYTHON_EXEC || 'python3';
 
+// Run compliance check for a given report
 router.get('/run-compliance-check/:reportId', async (req, res) => {
   try {
     const { reportId } = req.params;
 
-    // 1️⃣ Get latest evaluation scores from DB
+    // 1️⃣ Fetch latest evaluation scores from DB
     const row = await db.get('SELECT scores FROM reports WHERE id = ?', [reportId]);
     if (!row || !row.scores) {
       return res.status(400).json({
@@ -83,35 +151,47 @@ router.get('/run-compliance-check/:reportId', async (req, res) => {
       });
     }
 
-    const evaluationData = row.scores;
+    // 2️⃣ Prepare JSON input for Python
+    const evalJSON = typeof row.scores === 'string' ? row.scores : JSON.stringify(row.scores);
 
-    // 2️⃣ Call Python script
+    // 3️⃣ Spawn Python script
     const scriptPath = path.join(__dirname, '..', 'map_rbi_compliance.py');
-    const process = spawn(pythonPath, [scriptPath], { cwd: path.join(__dirname, '..') });
+    const pyProcess = spawn(pythonPath, [scriptPath], { cwd: path.join(__dirname, '..') });
 
     let output = '';
     let errorOutput = '';
 
-    process.stdin.write(evaluationData);
-    process.stdin.end();
+    pyProcess.stdin.write(evalJSON);
+    pyProcess.stdin.end();
 
-    process.stdout.on('data', data => {
+    pyProcess.stdout.on('data', data => {
       output += data.toString();
       console.log('[Python stdout]:', data.toString());
     });
 
-    process.stderr.on('data', data => {
+    pyProcess.stderr.on('data', data => {
       errorOutput += data.toString();
       console.error('[Python stderr]:', data.toString());
     });
 
-    process.on('close', code => {
+    // 4️⃣ Handle script completion
+    pyProcess.on('close', code => {
       if (code === 0) {
-        res.json({
-          success: true,
-          message: '✅ Compliance check completed successfully.',
-          output
-        });
+        try {
+          const pyResult = JSON.parse(output);
+          res.json({
+            success: true,
+            message: '✅ Compliance check completed successfully.',
+            csv: pyResult.csv || null,
+            pdf: pyResult.pdf || null,
+            output: pyResult
+          });
+        } catch (err) {
+          res.status(500).json({
+            error: 'Failed to parse compliance output',
+            details: err.message
+          });
+        }
       } else {
         res.status(500).json({
           error: '❌ Compliance check failed.',
@@ -119,6 +199,7 @@ router.get('/run-compliance-check/:reportId', async (req, res) => {
         });
       }
     });
+
   } catch (err) {
     console.error('[COMPLIANCE ERROR]:', err);
     res.status(500).json({ error: 'Internal server error.' });
