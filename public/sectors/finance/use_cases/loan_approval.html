@@ -278,24 +278,47 @@
       event.currentTarget.classList.add('active');
     }
 
-    function runComplianceCheck() {
-  fetch('/api/run-compliance-check') // Use relative path for compatibility
-        .then(res => res.json())
-        .then(data => {
-          const list = document.getElementById('summaryList');
-          list.innerHTML = '';
+  //   function runComplianceCheck() {
+  // fetch('/api/run-compliance-check') // Use relative path for compatibility
+  //       .then(res => res.json())
+  //       .then(data => {
+  //         const list = document.getElementById('summaryList');
+  //         list.innerHTML = '';
           
-          list.innerHTML = `<li>${data.message}</li>`;
+  //         list.innerHTML = `<li>${data.message}</li>`;
 
-          if (data.output) {
-            list.innerHTML += `<li><pre>${data.output}</pre></li>`;
-          }
-        })
-        .catch(err => {
-          console.error('Compliance check failed', err);
-          document.getElementById('summaryList').innerHTML = '<li><strong>Error:</strong> Compliance check failed</li>';
-        });
-    }
+  //         if (data.output) {
+  //           list.innerHTML += `<li><pre>${data.output}</pre></li>`;
+  //         }
+  //       })
+  //       .catch(err => {
+  //         console.error('Compliance check failed', err);
+  //         document.getElementById('summaryList').innerHTML = '<li><strong>Error:</strong> Compliance check failed</li>';
+  //       });
+  //   }
+
+    function runComplianceCheck() {
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '<li>🕒 Compliance check is running... please wait.</li>';
+      
+        fetch('/api/run-compliance-check')
+          .then(res => res.json())
+          .then(data => {
+            summaryList.innerHTML = '';
+            if (data.success) {
+              summaryList.innerHTML = `<li>✅ ${data.message}</li>
+                                       <li>CSV: ${data.csv}</li>
+                                       <li>PDF: ${data.pdf}</li>`;
+            } else {
+              summaryList.innerHTML = `<li>❌ Compliance check failed</li>`;
+            }
+          })
+          .catch(err => {
+            console.error('Compliance check failed', err);
+            summaryList.innerHTML = '<li>❌ Error: Compliance check failed</li>';
+          });
+      }
+
 
     function closeModal() {
       document.getElementById('reportModal').style.display = 'none';
