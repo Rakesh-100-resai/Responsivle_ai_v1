@@ -58,19 +58,33 @@ router.post(
         [reportId, dataset_id || 'custom']
       );
 
+
+      const scriptPath = path.join(__dirname, '..', 'evaluate_model.py'); // correct relative path
       const spawnArgs = [
-        'evaluate_model.py',
+        scriptPath,
         modelPath,
         datasetPath,
-        JSON.stringify(parsedPrinciples)
+        JSON.stringify(parsedPrinciples),
+        '--model_type',
+        mappedModelType
       ];
-      if (mappedModelType) {
-        spawnArgs.push('--model_type', mappedModelType);
-      }
-
-      // const proc = spawn('python3', spawnArgs);
-     
+      
+      const pythonPath = process.env.PYTHON_EXEC || 'python3';
       const proc = spawn(pythonPath, spawnArgs);
+
+      // const spawnArgs = [
+      //   'evaluate_model.py',
+      //   modelPath,
+      //   datasetPath,
+      //   JSON.stringify(parsedPrinciples)
+      // ];
+      // if (mappedModelType) {
+      //   spawnArgs.push('--model_type', mappedModelType);
+      // }
+
+      // // const proc = spawn('python3', spawnArgs);
+     
+      // const proc = spawn(pythonPath, spawnArgs);
 
       // const proc = spawn(
       //   'C:\\Users\\IFOCUS\\AppData\\Local\\Programs\\Python\\Python310\\python.exe',
