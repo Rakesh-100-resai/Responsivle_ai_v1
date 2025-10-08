@@ -107,10 +107,15 @@ router.post(
       });
 
       // Update report
+      // await db.run('UPDATE reports SET progress = 100, scores = ? WHERE id = ?', [
+      //   JSON.stringify(result.report),
+      //   reportId
+      // ]);
       await db.run('UPDATE reports SET progress = 100, scores = ? WHERE id = ?', [
         JSON.stringify(result.report),
         reportId
       ]);
+
 
       // Clean up uploaded files
       if (datasetFile?.path) await fs.unlink(datasetFile.path).catch(() => {});
