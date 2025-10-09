@@ -16,6 +16,8 @@ from art.estimators.classification import SklearnClassifier
 from art.attacks.evasion import FastGradientMethod, ProjectedGradientDescent, DeepFool, BoundaryAttack, HopSkipJump, ZooAttack
 from sklearn.model_selection import train_test_split
 
+
+
 # Suppress AIF360 warnings
 logging.getLogger('aif360').setLevel(logging.ERROR)
 
@@ -778,7 +780,7 @@ def main():
     #     debug_print(f"Could not save report to JSON: {e}")
 
 
-    import tempfile, os, json
+import tempfile, os, json
     
     tmp_report_path = os.path.join(tempfile.gettempdir(), "evaluation_report.json")
     try:
