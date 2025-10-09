@@ -790,6 +790,7 @@ def main():
         debug_print(f"Could not save report to JSON: {e}")
     
     # Print final JSON output (Node reads this)
+    print(json.dumps(report))
     print(json.dumps({
         "report": report,
         "report_path": tmp_report_path
