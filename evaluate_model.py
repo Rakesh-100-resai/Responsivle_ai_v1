@@ -7,6 +7,7 @@ import json
 import sys
 import argparse
 import logging
+import tempfile, os, json
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from aif360.datasets import BinaryLabelDataset
@@ -780,7 +781,6 @@ def main():
     #     debug_print(f"Could not save report to JSON: {e}")
 
 
-import tempfile, os, json
     
     tmp_report_path = os.path.join(tempfile.gettempdir(), "evaluation_report.json")
     try:
