@@ -7,7 +7,7 @@ import json
 import sys
 import argparse
 import logging
-import tempfile, os, json
+import tempfile, os
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from aif360.datasets import BinaryLabelDataset
