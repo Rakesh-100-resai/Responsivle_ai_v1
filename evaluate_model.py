@@ -769,16 +769,30 @@ def main():
             report[principle] = {"score": 5, "notes": [f"Error evaluating principle: {e}"]}
 
     # Output the report
-    print(json.dumps(report))
-    report_path = "evaluation_report.json"
+    # print(json.dumps(report))
+    # report_path = "evaluation_report.json"
+    # try:
+    #     with open(report_path, 'w') as f:
+    #         json.dump(report, f, indent=2)
+    # except Exception as e:
+    #     debug_print(f"Could not save report to JSON: {e}")
+
+
+    import tempfile, os, json
+    
+    tmp_report_path = os.path.join(tempfile.gettempdir(), "evaluation_report.json")
     try:
-        with open(report_path, 'w') as f:
+        with open(tmp_report_path, 'w') as f:
             json.dump(report, f, indent=2)
     except Exception as e:
         debug_print(f"Could not save report to JSON: {e}")
+    
+    # Print final JSON output (Node reads this)
+    print(json.dumps({
+        "report": report,
+        "report_path": tmp_report_path
+    }))
+    
 
 if __name__ == "__main__":
     main()
-
-# if __name__ == "__main__":
-#     main()
